@@ -1,0 +1,69 @@
+model:
+  base_momentum: 0.996
+  backbone:
+    type: "resnet50"
+    pretrained: false
+  projection:
+    type: "MLP"
+    input_dim: 2048
+    hidden_dim: 4096
+    output_dim: 256
+  predictor:
+    type: "MLP"
+    input_dim: 256
+    hidden_dim: 4096
+    output_dim: 256
+
+sync_bn: True
+
+data:
+  dataset_name : 'baibu_raw_224'
+  resize_size: 224
+  data_workers: 8
+  train_batch_size: 32
+  val_batch_size: 64
+  dual_views: true
+
+  #for imagenet
+  imagenet:
+    image_dir: "/home/admin/workspace/shared/imagenet/"
+
+  # for oss
+  oss:
+    train_list: "imagenet/imagenet_train_fullpath.txt"
+    val_list: "imagenet/imagenet_val_fullpath.txt"
+    endpoint:
+    key_id:
+    secret_id:
+    bucket:
+
+  #for baibu raw image resize 224
+  baibu_raw_224:
+    image_dir: "/data/tanghaoming/raw_imgs_resize_224"
+
+optimizer:
+  type: lars
+  base_lr: 0.3
+  momentum: 0.9
+  weight_decay: 1.5e-6
+  total_epochs: 300
+  warmup_epochs: 10
+  exclude_bias_and_bn: true
+
+checkpoint:
+  folder_stamp: "resnet50_1"
+  resume_path: "saved_models/resnet50_1/resnet50_epoch38.pth"
+  save_epoch: 1
+  ckpt_prefix: "saved_models/{}/{}_epoch{}.pth"
+
+log:
+  log_step: 10
+#  acc_log_file: "log/{}/{}/log/acc_log_file.log"
+#  acc_log_png: "log/{}/{}/log/acc_log_file.png"
+  loss_log_file: "log/{}/{}/loss_log_file.log"
+  loss_log_png: "log/{}/{}/loss_log_file.png"
+  lr_log_file: "log/{}/{}/lr_log_file.log"
+  lr_log_png: "log/{}/{}/lr_log_file.png"
+
+stage: "train"
+distributed: true
